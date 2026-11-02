@@ -41,7 +41,13 @@ localStorage 有容量上限，建議定期備份。資料讀取失敗時會停�
 
 以 HTTPS 提供 `dist/` 靜態檔案。瀏覽器支援時可使用「加入主畫面」；首次完整載入後可離線操作。iOS 與 Android 的安裝提示及離線能力依瀏覽器而異，尚未進行實體手機驗證。
 
-`dist/` 支援網站根路徑與 GitHub Pages 的儲存庫子路徑。GitHub Pages 可部署 `dist/`，不需要建置步驟。此專案沒有啟用公開 Pages；上傳原始碼不代表已開啟 GitHub 網站託管。
+`dist/` 支援網站根路徑與 GitHub Pages 的儲存庫子路徑。GitHub Pages 可部署 `dist/`，不需要建置步驟。發布用靜態檔案位於 `gh-pages` 分支根目錄，包含 `.nojekyll`。在 GitHub Settings → Pages 選擇 Deploy from a branch、`gh-pages`、`/(root)`，儲存後由 GitHub 建置。若畫面要求升級或公開儲存庫，先由擁有者決定；不能假定 Pages 已啟用。
+
+後續修改時需同時更新 `main` 的 `dist/` 與 `gh-pages` 根目錄，兩者內容一致後再確認 Pages 建置結果。未設定 GitHub Actions 自動同步。
+
+網站網址切換會形成不同的本機帳本：若舊 Sites 網址已有資料，先下載 JSON 備份，再到 GitHub Pages 還原，資料不會自動移轉。
+
+RWD 已檢查 280–2560 CSS 像素的 10 組尺寸與三頁、表單操作；保留原配色及版面結構。詳見 `QA.md`。
 
 Sites 專用的 `.openai/hosting.json` 保存此專案的託管識別，不含帳本或登入憑證。
 
