@@ -123,3 +123,8 @@ main::-webkit-scrollbar{display:none;width:0;height:0}
 .summary-toggle[aria-expanded=true] .disclosure::before{content:'⌃'}
 .overview-details[hidden],.overview-details>section[hidden]{display:none}
 @media(min-width:761px){#overview-recent{grid-column:1;grid-row:1}#overview-upcoming{grid-column:2;grid-row:1}}
+
+/* Homepage only: choose a year/month from the balance label. */
+.overview-month-button{border:0;border-radius:8px;padding:0;background:transparent;text-align:left;flex-wrap:wrap;max-width:100%}
+.overview-month-button:hover{background:transparent}
+.overview-month-button .pill{white-space:normal}
