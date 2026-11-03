@@ -114,3 +114,12 @@ main{flex:1;min-height:0;width:calc(100% - 64px);margin:20px auto 0;padding-bott
 /* Hide the main scrollbar while retaining native scrolling. */
 main{scrollbar-width:none;-ms-overflow-style:none}
 main::-webkit-scrollbar{display:none;width:0;height:0}
+
+/* Independent overview disclosures retain the original detail cards. */
+.summary-toggle{text-align:left;width:100%;color:inherit}
+.summary-toggle:hover{background:rgba(255,255,255,.94)}
+.summary-toggle .amount{display:block}
+.summary-toggle .disclosure::before{content:'⌄'}
+.summary-toggle[aria-expanded=true] .disclosure::before{content:'⌃'}
+.overview-details[hidden],.overview-details>section[hidden]{display:none}
+@media(min-width:761px){#overview-recent{grid-column:1;grid-row:1}#overview-upcoming{grid-column:2;grid-row:1}}
