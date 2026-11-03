@@ -60,3 +60,9 @@ Sites 專用的 `.openai/hosting.json` 保存此專案的託管識別，不含�
 - `tests/core.test.mjs`：核心自動測試。
 - `PLAN.md`：確認後的需求與範圍。
 - `QA.md`：本次檢查結果。
+
+
+## Pocketa v1.1.0：資料與設定
+第四頁集中 JSON 備份／還原、CSV、分類管理、範例帳本及版本更新。更新按鈕會查詢 version.json，確認新版首頁已發布後自動重新開啟；不清除 localStorage。網路或發布異常會顯示可重試提示。
+
+後續發布必須同步遞增 dist/update.js 的 RELEASE.build、dist/version.json 的 build、首頁 pocketa-build、資源查詢版本及 sw.js 的快取版本，並同步 version/date。請將所有 dist 檔案（含 update.js、version.json）一起發布到 gh-pages，避免只更新版本描述。
