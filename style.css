@@ -96,3 +96,17 @@ main{flex:1;min-height:0;width:calc(100% - 64px);margin:20px auto 0;padding-bott
  .bottom-bar{margin-top:4px;margin-bottom:0}
  .bottom-bar button{padding-top:6px;padding-bottom:6px}
 }
+
+/* Fourth tab: data management and release updates. */
+.settings-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px}
+.settings-card{padding:26px;min-width:0}
+.settings-actions{border:0;margin:20px 0 0;padding:0;min-width:0}
+.settings-actions button{overflow-wrap:anywhere}
+.settings-about{grid-column:1/-1}
+.version-number{margin:24px 0 12px;font-size:18px;overflow-wrap:anywhere}
+.version-number strong{font-size:26px}
+.update-button{margin-top:10px;width:100%}
+.bottom-bar{max-width:100%}
+.bottom-bar button{min-width:0}
+@media(max-width:760px){.settings-grid{grid-template-columns:minmax(0,1fr);gap:14px}.settings-card{padding:22px 18px}.bottom-bar button{padding-inline:3px;font-size:11px}}
+@media(max-width:360px){.bottom-bar{padding-inline:5px;gap:1px}.bottom-bar button{font-size:10px}}
