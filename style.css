@@ -128,3 +128,8 @@ main::-webkit-scrollbar{display:none;width:0;height:0}
 .overview-month-button{border:0;border-radius:8px;padding:0;background:transparent;text-align:left;flex-wrap:wrap;max-width:100%}
 .overview-month-button:hover{background:transparent}
 .overview-month-button .pill{white-space:normal}
+
+/* Keep iOS date controls inside their existing grid column. */
+#entry-form .entry-date-field{min-width:0}
+#entry-form .entry-date-field input[type=date]{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:0;min-width:100%;max-width:100%;display:block}
+#entry-form .entry-date-field input[type=date]::-webkit-date-and-time-value{min-width:0}
