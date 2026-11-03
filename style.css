@@ -133,3 +133,6 @@ main::-webkit-scrollbar{display:none;width:0;height:0}
 #entry-form .entry-date-field{min-width:0}
 #entry-form .entry-date-field input[type=date]{-webkit-appearance:none;appearance:none;box-sizing:border-box;width:0;min-width:100%;max-width:100%;display:block}
 #entry-form .entry-date-field input[type=date]::-webkit-date-and-time-value{min-width:0}
+
+/* Empty iOS end dates retain the same box height as filled start dates. */
+#entry-form input[type=date][name=start],#entry-form input[type=date][name=end]{line-height:1.2;height:calc(1.2em + 26px);min-height:calc(1.2em + 26px)}

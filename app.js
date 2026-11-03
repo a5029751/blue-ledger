@@ -1,4 +1,4 @@
-import {RELEASE,checkRelease,prepareRelease} from './update.js?v=10';
+import {RELEASE,checkRelease,prepareRelease} from './update.js?v=11';
 import {uid,today,cents,money,initial,dueDate,shiftMonth,synchronize,removeRecord,total,monthRows,upcoming,validate,csv,validDate} from './core.js';
 const KEY='blue-ledger-v1',app=document.querySelector('#app'),modal=document.querySelector('#modal');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
