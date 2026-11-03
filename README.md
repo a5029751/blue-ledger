@@ -1,4 +1,4 @@
-# 澄帳 Blue Ledger
+# Pocketa Blue Ledger
 
 三頁式個人記帳 PWA，以深藍至白色漸層與黑色文字呈現。繁體中文、新臺幣、臺灣時區。
 

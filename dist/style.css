@@ -79,3 +79,20 @@ dialog .form-footer{position:relative}
  dialog{max-height:calc(100dvh - 16px);margin-top:8px;margin-bottom:8px}
 }
 @media(hover:none){button,.month-picker button,.category-link{min-height:44px}}
+
+/* App shell: keep navigation in place and scroll only the content pane. */
+html{height:100%;overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;height:100%;height:100dvh;min-height:0;overflow:hidden;overscroll-behavior:none;display:flex;flex-direction:column}
+.topbar{flex:none;width:100%;margin:0 auto;position:relative;z-index:1}
+main{flex:1;min-height:0;width:calc(100% - 64px);margin:20px auto 0;padding-bottom:24px;overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.bottom-bar{position:relative;flex:none;align-self:center;left:auto;bottom:auto;transform:none;margin:12px 0 max(20px,env(safe-area-inset-bottom,0px))}
+@media(max-width:760px){
+ main{width:calc(100% - max(18px,env(safe-area-inset-left,0px)) - max(18px,env(safe-area-inset-right,0px)));margin:12px auto 0;padding-bottom:20px}
+ .bottom-bar{margin:0;flex-shrink:0}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .topbar{padding-top:max(8px,env(safe-area-inset-top,0px));padding-bottom:8px}
+ main{margin-top:4px}
+ .bottom-bar{margin-top:4px;margin-bottom:0}
+ .bottom-bar button{padding-top:6px;padding-bottom:6px}
+}
