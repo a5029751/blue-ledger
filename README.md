@@ -4,8 +4,8 @@ Pocketa 是繁體中文個人記帳 Web App，協助記錄日常支出、收入�
 
 - [開啟 Pocketa](https://a5029751.github.io/blue-ledger/)
 - [GitHub 原始碼](https://github.com/a5029751/blue-ledger)
-- 目前發布版本：**v1.2.4（build 11）**
-- 文件整理日期：**2026-11-03**
+- 目前發布版本：**v2.0.0（build 12）**
+- 文件整理日期：**2026-11-04**
 
 目前交付形式是部署於 GitHub Pages 的網頁／PWA，可在支援的瀏覽器加入主畫面，以 App 式介面使用；並非 Apple 簽署的 IPA 安裝檔。
 
@@ -21,6 +21,8 @@ Pocketa 是繁體中文個人記帳 Web App，協助記錄日常支出、收入�
 - [版本紀錄](#版本紀錄)
 
 ## 已完成項目
+
+前端已改為 **React 19 + Vite 7**：四頁、表單及互動皆由 React 元件與狀態管理，保留既有漸層、固定外框、隱藏捲動條、日期框尺寸與操作流程。正式資源包含 React 本身，使用時不依賴外部 CDN。
 
 ### 四個主要分頁
 
@@ -130,49 +132,66 @@ Pocketa 是繁體中文個人記帳 Web App，協助記錄日常支出、收入�
 
 ```text
 blue-ledger/
-├── README.md                 專案介紹、操作說明及維護流程
-├── PLAN.md                   原始需求與計劃紀錄
-├── QA.md                     各階段驗證結果與限制
-├── package.json              本機啟動及測試指令
-├── server.mjs                本機靜態伺服器（提供 dist/）
-├── dist/                     可直接發布的網站檔案
-│   ├── index.html            頁面外框、四分頁列及資源入口
-│   ├── style.css             漸層、RWD、固定外框及捲動樣式
-│   ├── app.js                四頁互動、資料保存、表單與匯入匯出
-│   ├── core.js               金額、日期、固定規則、統計與資料驗證
-│   ├── update.js             目前版本、版本查詢及新版首頁檢查
-│   ├── version.json          對外提供的最新版本資訊
-│   ├── sw.js                 Service Worker 與離線快取
-│   ├── manifest.webmanifest  Web App 名稱、圖示與主畫面設定
-│   └── icon.svg              App 圖示
+├── README.md / PLAN.md / QA.md  使用說明、需求及驗證紀錄
+├── index.html                 Vite HTML 入口與 pocketa-build
+├── package.json               React / Vite 依賴與指令
+├── pnpm-lock.yaml             可重現安裝的依賴鎖定檔
+├── pnpm-workspace.yaml        建置套件初始化允許清單
+├── vite.config.js             相對路徑及 React JSX 建置設定
+├── src/
+│   ├── main.jsx               React createRoot 入口
+│   ├── App.jsx                四頁外框、UI 狀態、同步與更新流程
+│   ├── context.jsx            共用 React Context
+│   ├── components.jsx         標題、月份選擇與收支列等共用元件
+│   ├── Overview.jsx           第一頁當月總覽
+│   ├── Ledger.jsx             第二頁收支、分類 NAV 與固定規則
+│   ├── Annual.jsx             第三頁年度收合表格
+│   ├── Settings.jsx           第四頁備份、還原與版本資訊
+│   ├── Modal.jsx              收支／規則、月份及分類表單
+│   ├── store.js               舊帳本讀取、儲存、示範模式與衝突保護
+│   ├── core.js                金額、日期、固定記帳與資料驗證
+│   ├── demo.js                虛構的範例帳本
+│   ├── update.js              RELEASE 與版本檢查
+│   └── style.css              保留既有樣式與日期修正
+├── public/                    圖示、manifest 與第三方授權文字
+├── scripts/build.mjs          建置、版本檢查及離線快取產生
+├── dist/                      建置後可發布的靜態網站
+│   ├── assets/                帶內容雜湊的 React JS / CSS
+│   ├── index.html             建置後入口
+│   ├── core.js / update.js    相容工具與舊客戶端的小型模組
+│   ├── version.json / sw.js   自動產生的版本與離線檔案
+│   └── .nojekyll              GitHub Pages 靜態發布標記
+├── server.mjs                 正式建置的本機預覽伺服器
 ├── tests/
-│   ├── core.test.mjs         記帳核心測試
-│   └── update.test.mjs       更新流程測試
-├── .openai/hosting.json      先前 Sites 託管識別與設定
-└── artifacts/                本機截圖與驗證產物（不納入 Git）
+│   ├── core.test.mjs          既有記帳核心測試
+│   ├── update.test.mjs        版本檢查測試
+│   └── store.test.mjs         React 帳本相容、衝突與還原測試
+├── .openai/hosting.json        先前 Sites 託管識別
+└── artifacts/                 本機驗證截圖（不納入 Git）
 ```
 
-`dist/` 是實際網站內容，不需要編譯。`artifacts/`、壓縮檔及 `node_modules/` 由 `.gitignore` 排除；截圖不一定存在於 GitHub。`.openai/hosting.json` 保留先前託管設定，不是目前 GitHub Pages 的發布入口，也不含帳目或登入憑證。
+開發時修改 `src/`、根目錄入口與 `public/`，再建置產生 `dist/`，請勿直接修改產物。`artifacts/`、壓縮檔及 `node_modules/` 不納入 Git。`.openai/hosting.json` 保留先前託管設定，不是目前 GitHub Pages 的發布入口。
 
 ## 本機啟動與測試
 
-需要 Node.js 20 或更新版；專案使用原生 HTML、CSS 與 JavaScript，沒有需要另外安裝的 npm 套件。
-
-在專案資料夾執行：
+需要 Node.js **20.19+ 或 22.12+**；本次以 Node.js 24 驗證。建議使用 pnpm，依照鎖定檔安裝：
 
 ```sh
-npm start
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-開啟 [本機預覽](http://127.0.0.1:4173/)。也可使用其他靜態伺服器提供 `dist/`，但不可直接以 `file://` 開啟，JavaScript 模組與離線功能需要 HTTP(S)。
-
-執行自動測試：
+開啟 [本機開發預覽](http://127.0.0.1:4173/)。也可使用 `npm install`、`npm run dev`，但可重現的套件版本以 `pnpm-lock.yaml` 為準。
 
 ```sh
-npm test
+pnpm test
+pnpm build
+pnpm preview
 ```
 
-測試涵蓋金額精度、日期與月底、固定記帳補建與防重複、暫停恢復、歷史紀錄保留、備份驗證、CSV 格式，以及版本比較、連線失敗與發布不一致處理。
+`pnpm test` 執行 16 項記帳核心、更新及帳本儲存測試；`pnpm build` 建置正式靜態檔案，檢查版本一致性並自動產生版本檔與 Service Worker；`pnpm preview` 於同一網址提供正式 `dist/`。開發伺服器與正式預覽請分開執行，避免同時占用 4173 埠。
+
+首次安裝需網路下載開發套件；正式網站已將 React 一起打包。任意靜態 HTTP(S) 伺服器可提供 `dist/`，不可直接以 `file://` 開啟。
 
 ## GitHub Pages 發布與版本維護
 
@@ -190,18 +209,19 @@ npm test
 
 ### 程式更新發布順序
 
-1. 修改程式，執行必要測試及本機畫面檢查。
-2. 同步更新 `dist/update.js` 的 `RELEASE` 與 `dist/version.json`：版本號、遞增的 build、發布日期須一致。
-3. 更新 `index.html` 的 `pocketa-build`、資源網址的版本參數，以及 `sw.js` 的快取名稱／預載清單；`app.js` 引用更新模組的版本參數亦須一致。新增或更動的資源需一併處理。
-4. 更新第四頁版本說明，必要時補充 README 與 QA 紀錄。
-5. 將原始碼提交到 `main`，再將完整 `dist/` 同步到 `gh-pages` 根目錄；不可只發布 `version.json`。
-6. 等待 Pages 發布成功，確認正式網站畫面與第四頁更新按鈕可正常使用。
+1. 在 `src/` 修改 React 元件或記帳邏輯，執行 `pnpm test` 與必要瀏覽器檢查。
+2. 更新 `src/update.js` 的 `RELEASE`（版本號、遞增的 build、日期）、`package.json` 版本及根目錄 `index.html` 的 `pocketa-build`。
+3. 執行 `pnpm build`。建置自動產生 `dist/version.json`、`dist/sw.js`、`.nojekyll`，並以內容雜湊處理 JS / CSS 快取；不再手動遞增資源網址參數。
+4. 更新第四頁版本說明、README 與必要的 QA 紀錄。
+5. 將來源、鎖定檔及建置產物提交到 `main`，將完整 `dist/` 同步到 `gh-pages` 根目錄；不可只發布 `version.json`。
+6. 等待 Pages 發布成功，檢查網站四頁、帳目相容性與第四頁更新按鈕。
 
-目前網站版本以 `dist/update.js` 與 `dist/version.json` 為準；`package.json` 的套件版本仍為 `1.0.0`，未用作網站更新判斷。僅更新 README 等說明文件時，不需增加 App 版本或重新發布網站。
+執行中的網站版本以 `src/update.js` 的 `RELEASE` 為來源；版本檔及離線清單由建置自動同步。舊帳本格式仍為 version 1，與 App 的版本號無關。僅修改 README 時不需增加 App 版本。
 
 ## 驗證紀錄與限制
 
-- v1.1.0 時執行的 11 個自動測試皆通過（8 個記帳核心、3 個更新測試）。
+- v2.0.0 執行的 16 個自動測試皆通過：8 個記帳核心、3 個更新、5 個儲存相容性與保護測試。
+- React 版已驗證一般收支新增、固定收入補建、年度統計、JSON 下載及還原、分類新增、版本檢查，以及 5 種尺寸的四頁排版與固定日期框尺寸。
 - 原三頁 RWD 曾驗證 280–2560 CSS 像素的 10 組尺寸；第四頁另驗證 280×653、390×844、768×1024、844×390、1440×900，導覽按鈕沒有超出畫面。
 - 已在瀏覽器測試模擬舊版更新後自動重新開啟，並返回設定頁顯示完成訊息。
 - v1.1.1 已確認主內容捲動條隱藏、內容仍能捲動，正式網站已發布。
@@ -222,3 +242,4 @@ npm test
 | v1.2.2 · 2026-11-03 | 修正手機新增／編輯一般收入與支出時日期欄位超出右側邊界的問題；僅限制日期欄位寬度，其他輸入框維持原樣。 |
 | v1.2.3 · 2026-11-03 | 固定收入／支出的開始與結束日期套用日期欄寬限制，分別對齊分類、每月記帳日與表單右側；其他欄位維持原樣。 |
 | v1.2.4 · 2026-11-03 | 固定收支的開始與結束日期使用一致高度，結束日期空白、填入及清空時保持同大小；其他欄位維持原樣。 |
+| v2.0.0 · 2026-11-04 | 全面改為 React 元件、Context 與帳本 store，使用 Vite 建置；保留既有資料格式及四頁功能，建置自動產生版本與離線快取。 |

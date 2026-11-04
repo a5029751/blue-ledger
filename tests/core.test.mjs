@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {initial,cents,dueDate,shiftMonth,synchronize,removeRecord,total,monthRows,upcoming,validate,csv} from '../dist/core.js';
+import {initial,cents,dueDate,shiftMonth,synchronize,removeRecord,total,monthRows,upcoming,validate,csv} from '../src/core.js';
 function fixture(){const d=initial();d.rules.push({id:'salary',type:'income',amount:5000000,category:'income-0',name:'薪資',note:'',method:'',day:31,start:'2024-01-01',end:'',status:'active',processedThrough:''});return d;}
 test('amounts use integer cents and reject unsafe input',()=>{assert.equal(cents('0.10')+cents('0.20'),30);for(const s of ['-1','0','1.001','Infinity','1e4','1000000000'])assert.throws(()=>cents(s));});
 test('month ends and year rollover',()=>{assert.equal(dueDate('2024-02',31),'2024-02-29');assert.equal(dueDate('2025-02',31),'2025-02-28');assert.equal(dueDate('2026-04',31),'2026-04-30');assert.equal(shiftMonth('2026-12',1),'2027-01');});

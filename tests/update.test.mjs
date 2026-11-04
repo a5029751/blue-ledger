@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {RELEASE,checkRelease,prepareRelease} from '../dist/update.js';
+import {RELEASE,checkRelease,prepareRelease} from '../src/update.js';
 const base='https://example.test/blue-ledger/';
 test('update checks bypass cache and only accept newer build numbers',async()=>{
  for(const build of [RELEASE.build-1,RELEASE.build,RELEASE.build+1]){
