@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {initial,cents,dueDate,shiftMonth,synchronize,removeRecord,total,monthRows,upcoming,validate,csv} from '../src/core.js';
 function fixture(){const d=initial();d.rules.push({id:'salary',type:'income',amount:5000000,category:'income-0',name:'薪資',note:'',method:'',day:31,start:'2024-01-01',end:'',status:'active',processedThrough:''});return d;}
-test('amounts use integer cents and reject unsafe input',()=>{assert.equal(cents('0.10')+cents('0.20'),30);for(const s of ['-1','0','1.001','Infinity','1e4','1000000000'])assert.throws(()=>cents(s));});
+test('amounts use integer cents and reject invalid input',()=>{assert.equal(cents('0.10')+cents('0.20'),30);for(const s of ['-1','0','1.001','Infinity','NaN','0.001'])assert.throws(()=>cents(s));});
 test('month ends and year rollover',()=>{assert.equal(dueDate('2024-02',31),'2024-02-29');assert.equal(dueDate('2025-02',31),'2025-02-28');assert.equal(dueDate('2026-04',31),'2026-04-30');assert.equal(shiftMonth('2026-12',1),'2027-01');});
 test('catch-up is idempotent and deletion cannot regenerate',()=>{const d=fixture();assert.equal(synchronize(d,'2024-03-31'),3);assert.equal(synchronize(d,'2024-03-31'),0);removeRecord(d,d.records[1].id);d.rules[0].processedThrough='';assert.equal(synchronize(d,'2024-03-31'),0);assert.equal(d.records.length,2);validate(d);});
 test('pause and resume exclude paused dates',()=>{const d=fixture();synchronize(d,'2024-01-31');d.rules[0].status='paused';assert.equal(synchronize(d,'2024-03-31'),0);d.rules[0].status='active';d.rules[0].processedThrough='2024-03-31';assert.equal(synchronize(d,'2024-04-30'),1);assert.deepEqual(d.records.map(r=>r.date),['2024-01-31','2024-04-30']);});

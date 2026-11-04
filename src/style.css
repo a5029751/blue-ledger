@@ -140,3 +140,4 @@ main::-webkit-scrollbar{display:none;width:0;height:0}
 /* React's root shares the existing fixed application shell. */
 #root{height:100%;min-height:0;display:flex;flex-direction:column}
 .table-wrap[hidden]{display:none}
+.amount-precision-note{font-size:11px;line-height:1.6;overflow-wrap:anywhere}
