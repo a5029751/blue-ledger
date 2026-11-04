@@ -4,10 +4,12 @@ const MAX_SAFE=BigInt(Number.MAX_SAFE_INTEGER);
 export const integer=n=>typeof n==='bigint'?n:BigInt(n);
 export const compact=n=>n<=MAX_SAFE&&n>=-MAX_SAFE?Number(n):n.toString();
 export function cents(value){
- const text=String(value).trim();
+ let text=String(value).trim();
+ const suffix=/([kmbtq])$/i.exec(text);
+ if(suffix)text=text.slice(0,-1)+'e+'+({k:3,m:6,b:9,t:12,q:15}[suffix[1].toLowerCase()]);
  if(text.length>2100)throw Error(`金額最多支援 ${MAX_AMOUNT_DIGITS} 位整數。`);
  const m=/^(\d+)(?:\.(\d*))?(?:[eE]([+-]?\d{1,5}))?$/.exec(text);
- if(!m)throw Error('請輸入正數，最多兩位小數；可使用 e 科學記號。');
+ if(!m)throw Error('請輸入正數，最多兩位小數；可使用 k、m、b、t、q 縮寫。');
  const exponent=Number(m[3]||0),fraction=m[2]||'';
  let digits=(m[1]+fraction).replace(/^0+/,'')||'0';
  const shift=exponent-fraction.length+2;
@@ -27,17 +29,21 @@ export const compareAmounts=(a,b)=>integer(a)<integer(b)?-1:integer(a)>integer(b
 export const sumAmounts=rows=>compact(rows.reduce((n,r)=>n+integer(r.amount),0n));
 export function percentage(a,b){const denominator=integer(b);return denominator>0n?Number(integer(a)*10000n/denominator)/100:0;}
 export function amountToDecimal(value,fixed=false){const n=integer(value),negative=n<0n,s=(negative?-n:n).toString().padStart(3,'0'),fraction=s.slice(-2),whole=s.slice(0,-2);return `${negative?'-':''}${whole}${fixed?'.'+fraction:fraction==='00'?'':'.'+fraction.replace(/0$/,'')}`;}
-export function scientific(value,precision=8){
- const n=integer(value);if(n===0n)return '0';
- let digits=(n<0n?-n:n).toString(),exponent=digits.length-3;
- let leading=digits.slice(0,precision).padEnd(precision,'0');
- if(digits.length>precision&&digits[precision]>='5'){leading=(BigInt(leading)+1n).toString();if(leading.length>precision){exponent++;leading=leading.slice(0,precision);}}
- const fraction=leading.slice(1).replace(/0+$/,'');
- return `${n<0n?'-':''}${leading[0]}${fraction?'.'+fraction:''}e${exponent>=0?'+':''}${exponent}`;
+const UNITS=[['k',100000n],['m',100000000n],['b',100000000000n],['t',100000000000000n],['q',100000000000000000n]];
+export const needsAbbreviation=value=>integer(absAmount(value))>=UNITS[0][1];
+export function abbreviate(value){
+ const signed=integer(value),n=signed<0n?-signed:signed;
+ if(n<UNITS[0][1])return amountToDecimal(value);
+ let index=0;
+ while(index<UNITS.length-1&&n>=UNITS[index+1][1])index++;
+ const round=i=>(n*100n+UNITS[i][1]/2n)/UNITS[i][1];
+ let hundredths=round(index);
+ if(hundredths>=100000n&&index<UNITS.length-1)hundredths=round(++index);
+ const fraction=(hundredths%100n).toString().padStart(2,'0').replace(/0+$/,'');
+ return `${signed<0n?'-':''}${hundredths/100n}${fraction?'.'+fraction:''}${UNITS[index][0]}`;
 }
-export const needsScientific=value=>integer(absAmount(value))>=100000000000000n;
 export function money(value){
- if(needsScientific(value)){const short=scientific(value);return short.startsWith('-')?'-$'+short.slice(1):'$'+short;}
+ if(needsAbbreviation(value)){const short=abbreviate(value);return short.startsWith('-')?'-$'+short.slice(1):'$'+short;}
  const exact=amountToDecimal(value),negative=exact.startsWith('-'),[whole,fraction]=(negative?exact.slice(1):exact).split('.');
- return `${negative?'-':''}$${whole.replace(/\B(?=(\d{3})+(?!\d))/g,',')}${fraction?'.'+fraction.padEnd(2,'0'):''}`;
+ return `${negative?'-':''}$${whole}${fraction?'.'+fraction.padEnd(2,'0'):''}`;
 }
