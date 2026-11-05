@@ -1,4 +1,4 @@
-export const RELEASE={version:'2.1.1',build:14,date:'2026-11-04'};
+export const RELEASE={version:'2.1.2',build:15,date:'2026-11-05'};
 export async function checkRelease(base,request=fetch){
  const url=new URL('./version.json',base);url.searchParams.set('check',Date.now());
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);

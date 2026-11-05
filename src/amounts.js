@@ -5,11 +5,12 @@ export const integer=n=>typeof n==='bigint'?n:BigInt(n);
 export const compact=n=>n<=MAX_SAFE&&n>=-MAX_SAFE?Number(n):n.toString();
 export function cents(value){
  let text=String(value).trim();
- const suffix=/([kmbtq])$/i.exec(text);
- if(suffix)text=text.slice(0,-1)+'e+'+({k:3,m:6,b:9,t:12,q:15}[suffix[1].toLowerCase()]);
+ text=text.replace(/×10\^(\d{1,5})$/,'e+$1');
+ const suffix=/(qa|qi|sx|sp|oc|no|dc|[kmbtq])$/i.exec(text);
+ if(suffix)text=text.slice(0,-suffix[1].length)+'e+'+({k:3,m:6,b:9,t:12,q:15,qa:15,qi:18,sx:21,sp:24,oc:27,no:30,dc:33}[suffix[1].toLowerCase()]);
  if(text.length>2100)throw Error(`金額最多支援 ${MAX_AMOUNT_DIGITS} 位整數。`);
  const m=/^(\d+)(?:\.(\d*))?(?:[eE]([+-]?\d{1,5}))?$/.exec(text);
- if(!m)throw Error('請輸入正數，最多兩位小數；可使用 k、m、b、t、q 縮寫。');
+ if(!m)throw Error('請輸入正數，最多兩位小數；可使用 K、M、B、T、Qa、Qi 等縮寫。');
  const exponent=Number(m[3]||0),fraction=m[2]||'';
  let digits=(m[1]+fraction).replace(/^0+/,'')||'0';
  const shift=exponent-fraction.length+2;
@@ -29,18 +30,20 @@ export const compareAmounts=(a,b)=>integer(a)<integer(b)?-1:integer(a)>integer(b
 export const sumAmounts=rows=>compact(rows.reduce((n,r)=>n+integer(r.amount),0n));
 export function percentage(a,b){const denominator=integer(b);return denominator>0n?Number(integer(a)*10000n/denominator)/100:0;}
 export function amountToDecimal(value,fixed=false){const n=integer(value),negative=n<0n,s=(negative?-n:n).toString().padStart(3,'0'),fraction=s.slice(-2),whole=s.slice(0,-2);return `${negative?'-':''}${whole}${fixed?'.'+fraction:fraction==='00'?'':'.'+fraction.replace(/0$/,'')}`;}
-const UNITS=[['k',100000n],['m',100000000n],['b',100000000000n],['t',100000000000000n],['q',100000000000000000n]];
+// K/M/B/T follow English compact notation. Qa onward are documented short-scale aliases.
+const UNITS=[['K',3],['M',6],['B',9],['T',12],['Qa',15],['Qi',18],['Sx',21],['Sp',24],['Oc',27],['No',30],['Dc',33]].map(([symbol,power])=>[symbol,10n**BigInt(power+2)]);
 export const needsAbbreviation=value=>integer(absAmount(value))>=UNITS[0][1];
 export function abbreviate(value){
  const signed=integer(value),n=signed<0n?-signed:signed;
  if(n<UNITS[0][1])return amountToDecimal(value);
  let index=0;
  while(index<UNITS.length-1&&n>=UNITS[index+1][1])index++;
- const round=i=>(n*100n+UNITS[i][1]/2n)/UNITS[i][1];
- let hundredths=round(index);
- if(hundredths>=100000n&&index<UNITS.length-1)hundredths=round(++index);
- const fraction=(hundredths%100n).toString().padStart(2,'0').replace(/0+$/,'');
- return `${signed<0n?'-':''}${hundredths/100n}${fraction?'.'+fraction:''}${UNITS[index][0]}`;
+ let [symbol,divisor]=UNITS[index];
+ // Beyond named aliases, use exact engineering notation instead of invented suffixes.
+ if(n>=divisor*1000n){const power=Math.floor((n.toString().length-3)/3)*3;symbol=`×10^${power}`;divisor=10n**BigInt(power+2);}
+ const whole=n/divisor,remainder=n%divisor;
+ const fraction=remainder.toString().padStart(divisor.toString().length-1,'0').replace(/0+$/,'');
+ return `${signed<0n?'-':''}${whole}${fraction?'.'+fraction:''}${symbol}`;
 }
 export function money(value){
  if(needsAbbreviation(value)){const short=abbreviate(value);return short.startsWith('-')?'-$'+short.slice(1):'$'+short;}
