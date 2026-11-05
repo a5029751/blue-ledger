@@ -39,11 +39,17 @@ export function abbreviate(value){
  let index=0;
  while(index<UNITS.length-1&&n>=UNITS[index+1][1])index++;
  let [symbol,divisor]=UNITS[index];
- // Beyond named aliases, use exact engineering notation instead of invented suffixes.
+ // Beyond named aliases, use engineering notation instead of invented suffixes.
  if(n>=divisor*1000n){const power=Math.floor((n.toString().length-3)/3)*3;symbol=`×10^${power}`;divisor=10n**BigInt(power+2);}
- const whole=n/divisor,remainder=n%divisor;
- const fraction=remainder.toString().padStart(divisor.toString().length-1,'0').replace(/0+$/,'');
- return `${signed<0n?'-':''}${whole}${fraction?'.'+fraction:''}${symbol}`;
+ const rounded=()=> (n*100n+divisor/2n)/divisor;
+ let hundredths=rounded();
+ if(hundredths>=100000n){
+  divisor*=1000n;
+  symbol=index<UNITS.length-1?UNITS[++index][0]:`×10^${divisor.toString().length-3}`;
+  hundredths=rounded();
+ }
+ const fraction=(hundredths%100n).toString().padStart(2,'0').replace(/0+$/,'');
+ return `${signed<0n?'-':''}${hundredths/100n}${fraction?'.'+fraction:''}${symbol}`;
 }
 export function money(value){
  if(needsAbbreviation(value)){const short=abbreviate(value);return short.startsWith('-')?'-$'+short.slice(1):'$'+short;}

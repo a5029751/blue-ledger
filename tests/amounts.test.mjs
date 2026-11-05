@@ -16,17 +16,20 @@ test('large totals and tiny residual balances remain exact beyond Number precisi
  assert.equal(subtractAmounts(0,value),'-99999999999999999999999999999999');
  assert.equal(total([row('income',value,'a'),row('income',value,'b')]).income,'199999999999999999999999999999998');
 });
-test('exact suffix display uses English short-scale powers without rounding or promotion',()=>{
- const cases=[['999.99','$999.99'],['1000','$1K'],['12200','$12.2K'],['12345','$12.345K'],['12345.67','$12.34567K'],['1000000','$1M'],['1000000000','$1B'],['1000000000000','$1T'],['1e15','$1Qa'],['1e18','$1Qi'],['1e21','$1Sx'],['1e24','$1Sp'],['1e27','$1Oc'],['1e30','$1No'],['1e33','$1Dc'],['999999','$999.999K'],['999999999999999','$999.999999999999T'],['1e36','$1×10^36']];
+test('suffix display uses two decimals and preserves short-scale units',()=>{
+ const cases=[['999.99','$999.99'],['1000','$1K'],['12200','$12.2K'],['12345','$12.35K'],['12345.67','$12.35K'],['1000000','$1M'],['1000000000','$1B'],['1000000000000','$1T'],['1e15','$1Qa'],['1e18','$1Qi'],['1e21','$1Sx'],['1e24','$1Sp'],['1e27','$1Oc'],['1e30','$1No'],['1e33','$1Dc'],['999999','$1M'],['999999999999999','$1Qa'],['1e36','$1×10^36']];
  for(const [input,expected] of cases)assert.equal(money(cents(input)),expected,input);
- assert.equal(abbreviate('-123456789012345678900'),'-1.234567890123456789Qi');
- assert.equal(money('-123456789012345678900'),'-$1.234567890123456789Qi');
+ assert.equal(abbreviate('-123456789012345678900'),'-1.23Qi');
+ assert.equal(money('-123456789012345678900'),'-$1.23Qi');
  assert.equal(money(cents('1e999')),'$1×10^999');
  assert.equal(percentage(cents('1e999'),cents('2e999')),50);
 });
-test('exact formatted suffixes roundtrip, including tiny cent remainders and legacy input',()=>{
+test('suffix input remains exact and display rounding preserves original values',()=>{
  for(const [input,plain] of [['12.2k','12200'],['1.25M','1250000'],['2b','2000000000'],['3t','3000000000000'],['4q','4000000000000000'],['4Qa','4000000000000000'],['1Qi','1000000000000000000'],['1.234K','1234'],['1×10^36','1'+'0'.repeat(36)]])assert.equal(amountToDecimal(cents(input)),plain);
- for(const plain of ['12345.67','99999999999999999999','1000000000000000.01','999999999999999999999999999999999999999999999.99','9'.repeat(1000)+'.99']){const value=cents(plain);assert.equal(cents(abbreviate(value)),value,plain);}
+ for(const plain of ['12345.67','99999999999999999999','1000000000000000.01','9'.repeat(1000)+'.99']){const value=cents(plain);const display=abbreviate(value);assert.equal(amountToDecimal(value),plain);assert.match(display,/^-?\d+(?:\.\d{1,2})?(?:K|M|B|T|Qa|Qi|Sx|Sp|Oc|No|Dc|×10\^\d+)$/);}
+ assert.equal(money(cents('1.235e36')),'$1.24×10^36');
+ assert.equal(money(cents('999.999e33')),'$1×10^36');
+ assert.equal(money(cents('999.999e36')),'$1×10^39');
 });
 test('backup and CSV keep the full amount, while unsafe numeric backups are rejected',()=>{
  const d=initial();d.version=2;d.records.push(row('income',cents('999999999999999999999999999999.99')));assert.deepEqual(validate(JSON.parse(JSON.stringify(d))),d);assert.ok(csv(d).includes('999999999999999999999999999999.99'));
