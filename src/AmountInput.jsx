@@ -1,7 +1,8 @@
-import {useState} from 'react';
+import {useState,useEffect} from 'react';
 import {amountToDecimal,cents,needsAbbreviation,abbreviate} from './amounts.js';
-export default function AmountInput({amount}){
+export default function AmountInput({amount,onValue}){
  const [raw,setRaw]=useState(amount===undefined?'':amountToDecimal(amount)),[focused,setFocused]=useState(false);
+ useEffect(()=>{onValue?.(raw);},[raw,onValue]);
  let short='';try{const parsed=cents(raw);if(needsAbbreviation(parsed))short=abbreviate(parsed);}catch{}
  return <><input className="money-input" name="amount" inputMode="decimal" type="text" maxLength={2100} placeholder="0" required value={focused||!short?raw:short} onChange={e=>setRaw(e.target.value)} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} aria-describedby={short?'amount-precision-note':undefined} autoFocus/><input name="amountExact" type="hidden" value={raw}/>{short&&<small className="amount-precision-note" id="amount-precision-note" aria-live="polite">顯示 {short}；儲存完整金額，點欄位可查看及編輯。</small>}</>;
 }

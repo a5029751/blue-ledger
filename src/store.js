@@ -7,7 +7,8 @@ export function createLedgerStore(storage){
  let snapshot={data,error,raw,demo};const listeners=new Set();
  const emit=()=>{snapshot={data,error,raw,demo};listeners.forEach(fn=>fn());};
  function save(next){
-  if([...next.records,...next.rules].some(r=>typeof r.amount==='string'))next.version=2;
+  if(next.rates||[...next.records,...next.rules].some(r=>r.fx))next.version=3;
+  if(next.version!==3&&[...next.records,...next.rules].some(r=>typeof r.amount==='string'))next.version=2;
   validate(next);
   if(!demo){if(error)throw Error(error);if(storage.getItem(STORAGE_KEY)!==raw)throw Error('其他分頁已更新資料，請重新整理後再儲存。');const nextRaw=JSON.stringify(next);storage.setItem(STORAGE_KEY,nextRaw);raw=nextRaw;}
   data=next;emit();
