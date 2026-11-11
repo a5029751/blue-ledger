@@ -1,9 +1,9 @@
 import {integer,compact,validAmount} from './amounts.js';
 export const CURRENCIES={TWD:'新臺幣',USD:'美元',HKD:'港幣',GBP:'英鎊',AUD:'澳幣',CAD:'加拿大幣',SGD:'新加坡幣',CHF:'瑞士法郎',JPY:'日圓',ZAR:'南非幣',SEK:'瑞典幣',NZD:'紐元',THB:'泰幣',PHP:'菲律賓披索',IDR:'印尼盾',EUR:'歐元',KRW:'韓元',VND:'越南盾',MYR:'馬來幣',CNY:'人民幣'};
-export const RATE_KINDS={spotSell:'即期・本行賣出',spotBuy:'即期・本行買入',cashSell:'現金・本行賣出',cashBuy:'現金・本行買入'};
+export const RATE_KINDS={reference:'API 參考匯率',spotSell:'即期・本行賣出',spotBuy:'即期・本行買入',cashSell:'現金・本行賣出',cashBuy:'現金・本行買入'};
 export function validRate(rate){return typeof rate==='string'&&/^\d{1,8}(?:\.\d{1,10})?$/.test(rate)&&Number(rate)>0;}
 export function convertToTwd(amount,rate){if(!validAmount(amount)||!validRate(rate))throw Error('請輸入大於零的匯率，最多十位小數。');const [w,f='']=rate.split('.'),divisor=10n**BigInt(f.length),n=(integer(amount)*BigInt(w+f)+divisor/2n)/divisor;if(n<=0n)throw Error('換算後金額小於新臺幣 0.01 元，請調整金額。');if(n.toString().length>1002)throw Error('換算後金額超出支援範圍。');return compact(n);}
-export function validFx(fx,amount){return fx&&fx.currency!=='TWD'&&Object.hasOwn(CURRENCIES,fx.currency)&&validAmount(fx.amount)&&validRate(fx.rate)&&Object.hasOwn(RATE_KINDS,fx.kind)&&['manual','bot-import'].includes(fx.source)&&typeof fx.quotedAt==='string'&&fx.quotedAt.length<=40&&convertToTwd(fx.amount,fx.rate).toString()===amount.toString();}
+export function validFx(fx,amount){return fx&&fx.currency!=='TWD'&&Object.hasOwn(CURRENCIES,fx.currency)&&validAmount(fx.amount)&&validRate(fx.rate)&&Object.hasOwn(RATE_KINDS,fx.kind)&&['manual','bot-import','exchangerate.dev'].includes(fx.source)&&typeof fx.quotedAt==='string'&&fx.quotedAt.length<=40&&(fx.source!=='exchangerate.dev'||(fx.delaySeconds===900&&typeof fx.stale==='boolean'&&['open','weekend','interbank_closed'].includes(fx.marketSession)&&['live','ecb_daily','market_daily'].includes(fx.feedSource)&&Number.isFinite(Date.parse(fx.quotedAt))))&&convertToTwd(fx.amount,fx.rate).toString()===amount.toString();}
 // Official CSV has one buy row and one sell row per currency; cash and spot are columns 3/4.
 export function parseBotCsv(text,asOf){
  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(asOf)||!Number.isFinite(Date.parse(asOf+'+08:00')))throw Error('請填寫台銀檔案的掛牌時間。');

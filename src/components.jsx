@@ -1,6 +1,7 @@
+import {RATE_CREDIT,rateTime} from './fx-api.js';
 import {useApp} from './context.jsx';
 import {money,shiftMonth} from './core.js';
-export function ForeignAmount({row}){return row.fx?<small className="foreign-amount" title={`1 ${row.fx.currency} = ${row.fx.rate} TWD`}>{row.fx.currency} {money(row.fx.amount).replace('$','')} · 匯率 {row.fx.rate}</small>:null;}
+export function ForeignAmount({row}){return row.fx?<small className="foreign-amount" title={`1 ${row.fx.currency} = ${row.fx.rate} TWD`}>{row.fx.currency} {money(row.fx.amount).replace('$','')} · 匯率 {row.fx.rate}{row.fx.source==='exchangerate.dev'&&<><br/>{rateTime(row.fx.quotedAt)} · 延遲約 15 分鐘<br/><a href={RATE_CREDIT} target="_blank" rel="noreferrer">exchangerate.dev ↗</a></>}</small>:null;}
 export const typeName=t=>t==='income'?'收入':'支出';
 export const icon=t=>t==='income'?'↙':'↗';
 export function Heading({title,sub,kicker,control}){return <div className="page-heading"><div><p className="eyebrow">{kicker}</p><h1>{title}</h1><p className="subtitle">{sub}</p></div>{control}</div>;}
