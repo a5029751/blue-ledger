@@ -9,3 +9,15 @@ test('rule edits preserve historical amounts and end date',()=>{const d=fixture(
 test('upcoming does not affect actual totals',()=>{const d=fixture();synchronize(d,'2024-01-01');assert.equal(upcoming(d,'2024-01','2024-01-01').length,1);assert.equal(total(d.records).balance,0);synchronize(d,'2024-02-29');assert.equal(total(monthRows(d,'2024-02')).balance,5000000);assert.equal(total(d.records).balance,10000000);});
 test('backup roundtrip and validation',()=>{const d=fixture();synchronize(d,'2024-02-29');assert.deepEqual(validate(JSON.parse(JSON.stringify(d))),d);const bad=structuredClone(d);bad.records.push({...bad.records[0]});assert.throws(()=>validate(bad));bad.records=[];bad.rules[0].category='missing';assert.throws(()=>validate(bad));const invalid=fixture();invalid.rules[0].start='2024-02-30';assert.throws(()=>validate(invalid));});
 test('CSV quotes content and neutralizes spreadsheet formula prefixes',()=>{const d=fixture();synchronize(d,'2024-01-31');d.records[0].name='=1+1';d.records[0].note='hello,"world"';const out=csv(d);assert.ok(out.startsWith('\ufeff'));assert.ok(out.includes("\"'=1+1\""));assert.ok(out.includes('hello,""world""'));});
+
+test('deleting either recurring type in any status preserves history and stops future generation',async()=>{
+ const {removeRule}=await import('../src/core.js');
+ for(const type of ['income','expense'])for(const status of ['active','paused','ended']){
+  const d=fixture();d.rules[0].type=type;d.rules[0].category=type+'-0';synchronize(d,'2024-03-31');removeRecord(d,d.records[1].id);d.rules[0].status=status;
+  const before=total(d.records),history=d.records.map(r=>({amount:r.amount,date:r.date,name:r.name}));
+  removeRule(d,'salary');assert.equal(d.rules.length,0);assert.equal(d.skipped.length,0);assert.equal(synchronize(d,'2025-12-31'),0);assert.deepEqual(total(d.records),before);assert.deepEqual(d.records.map(r=>({amount:r.amount,date:r.date,name:r.name})),history);assert.ok(d.records.every(r=>r.recurring&&!r.ruleId&&!r.occurrence));assert.deepEqual(validate(JSON.parse(JSON.stringify(d))),d);assert.ok(csv(d).includes('"是"'));
+ }
+});
+test('rule deletion only touches its own links and preserves foreign amount metadata',async()=>{
+ const {removeRule}=await import('../src/core.js');const d=fixture();d.version=3;const r=d.rules[0];r.fx={currency:'USD',amount:10000,rate:'32',kind:'spotBuy',source:'manual',quotedAt:''};r.amount=320000;d.rules.push({...r,id:'salary-other',fx:structuredClone(r.fx)});synchronize(d,'2024-02-29');removeRecord(d,d.records.find(x=>x.ruleId==='salary-other').id);const other=d.records.filter(r=>r.ruleId==='salary-other').map(r=>structuredClone(r)),skipped=[...d.skipped];removeRule(d,'salary');assert.deepEqual(d.records.filter(r=>r.ruleId==='salary-other'),other);assert.deepEqual(d.skipped,skipped);assert.equal(d.records.find(r=>r.recurring).fx.rate,'32');validate(d);assert.throws(()=>removeRule(d,'missing'));
+});
