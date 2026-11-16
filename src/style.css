@@ -154,3 +154,12 @@ main::-webkit-scrollbar{display:none;width:0;height:0}
 .balance-donut.is-empty{background:#c3d6ef40}
 @media(max-width:760px){.balance-donut{width:108px}.balance-main{gap:16px}}
 @media(max-width:360px){.balance-donut{width:82px}.balance-main{gap:12px}}
+
+/* Shared responsive constraints for all pages and dialogs. */
+.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.form-grid>*,.rule-top>*{min-width:0;max-width:100%}
+.rule-top h2,.category-manage>span,.filter-total{overflow-wrap:anywhere}
+.category-manage>span{min-width:0;max-width:100%}
+.subtabs{max-width:100%;flex-wrap:wrap}
+.settings-actions button{max-width:100%;white-space:normal}
+@media(max-width:360px){.form-grid{grid-template-columns:minmax(0,1fr)}}
