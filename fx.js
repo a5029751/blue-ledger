@@ -17,3 +17,12 @@ export function parseBotCsv(text,asOf){
  return {asOf,importedAt:new Date().toISOString(),quotes};
 }
 export function validRates(r){return r&&typeof r.asOf==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(r.asOf)&&Number.isFinite(Date.parse(r.asOf+'+08:00'))&&typeof r.importedAt==='string'&&r.importedAt.length<=40&&r.quotes&&typeof r.quotes==='object'&&!Array.isArray(r.quotes)&&Object.keys(r.quotes).length>0&&Object.entries(r.quotes).every(([c,q])=>c!=='TWD'&&Object.hasOwn(CURRENCIES,c)&&q&&typeof q==='object'&&Object.entries(q).every(([k,v])=>Object.hasOwn(RATE_KINDS,k)&&validRate(v)));}
+
+export function convertFromTwd(amount,rate){
+ if(!validAmount(amount)||!validRate(rate))throw Error('請輸入大於零的匯率，最多十位小數。');
+ const [whole,fraction='']=rate.split('.'),divisor=BigInt(whole+fraction),scale=10n**BigInt(fraction.length);
+ const n=(integer(amount)*scale+divisor/2n)/divisor;
+ if(n<=0n)throw Error('換算後金額小於 0.01，請調整金額。');
+ if(n.toString().length>1002)throw Error('換算後金額超出支援範圍。');
+ return compact(n);
+}
