@@ -163,3 +163,27 @@ main::-webkit-scrollbar{display:none;width:0;height:0}
 .subtabs{max-width:100%;flex-wrap:wrap}
 .settings-actions button{max-width:100%;white-space:normal}
 @media(max-width:360px){.form-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Settings currency calculator: amount, result and custom rate. */
+.currency-converter{padding:32px}
+.currency-converter h2{font-size:28px;letter-spacing:.02em}
+.converter-subtitle{font-size:16px;line-height:1.6;margin:10px 0 28px}
+.converter-entry>label,.converter-custom label{display:block;font-size:16px;font-weight:650;line-height:1.5}
+.converter-input-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.4fr);gap:14px;margin-top:12px}
+.converter-input-row>input{font-size:28px;font-weight:600;padding:18px 20px}
+.converter-currency{font-size:18px;font-weight:600;padding:18px 14px;max-width:100%;min-width:0}
+.converter-twd{border:1px solid #d4deeb;border-radius:10px;background:#fafcff;display:flex;align-items:center}
+.converter-result{margin:28px 0;padding:22px;border-radius:16px;background:linear-gradient(120deg,#e6effd,#f9fcff)}
+.converter-result-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.converter-result-heading h3{font-size:17px}
+.converter-swap{background:transparent;border-color:#b9cde7;padding:8px 12px;font-size:14px}
+.converter-value{display:block;font-size:clamp(30px,4vw,48px);font-weight:700;letter-spacing:-.03em;margin:18px 0 10px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.converter-equation{font-size:16px;line-height:1.6;margin:0;overflow-wrap:anywhere}
+.converter-target{display:block;width:min(100%,240px);font-size:16px;padding:10px;margin-top:14px}
+.converter-custom{border-top:1px solid var(--line);padding-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.4fr);gap:18px;align-items:center}
+.converter-custom p{font-size:14px;line-height:1.6;margin:6px 0 0}
+.converter-custom input{font-size:20px;padding:16px}
+.converter-api{margin-top:24px}
+.converter-credit{font-size:12px;line-height:1.6;display:inline-block}
+@media(max-width:760px){.currency-converter{padding:24px 18px}.currency-converter h2{font-size:25px}.converter-input-row{grid-template-columns:minmax(0,1fr) minmax(110px,.7fr);gap:10px}.converter-input-row>input{font-size:24px;padding:16px 12px}.converter-currency{font-size:16px;padding:16px 10px}.converter-custom{grid-template-columns:minmax(0,1fr);gap:12px}.converter-result{padding:18px;margin:24px 0}}
+@media(max-width:360px){.converter-input-row{grid-template-columns:minmax(0,1fr)}.converter-result-heading{gap:10px}.converter-result{padding:16px}.converter-result-heading h3{font-size:16px}}
